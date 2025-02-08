@@ -3,6 +3,7 @@ import { LoginComponent } from './components/auth/login/login.component';
 import { RegisterComponent } from './components/auth/register/register.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { OrganizationDetailsComponent } from './components/organization/organization-details.component';
+import { ProfileComponent } from './components/profile/profile.component';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -11,5 +12,6 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'organizations/:id', component: OrganizationDetailsComponent, canActivate: [AuthGuard] },
+  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: '/dashboard' }
 ];

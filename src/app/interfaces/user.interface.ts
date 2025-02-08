@@ -3,6 +3,7 @@ export interface User {
   id?: string;  // Optional id field for API compatibility
   name: string;
   email: string;
+  description?: string;  // Optional description field
   profilePicture?: string;
   organizations: string[];
 }

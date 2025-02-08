@@ -7,11 +7,24 @@ import { User } from '../../interfaces/user.interface';
 import { OrganizationService } from '../../services/organization.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { DialogService } from '../../services/dialog.service';
+import { UpdateOrganizationDialogComponent } from './update-organization-dialog.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-organization-details',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    MatButtonModule, 
+    MatIconModule, 
+    MatFormFieldModule, 
+    MatSelectModule
+  ],
   template: `
     <div class="min-h-screen bg-gray-50 py-6">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -27,9 +40,16 @@ import { Router } from '@angular/router';
                   <p class="text-gray-500">{{organization?.description}}</p>
                 </div>
               </div>
-              <div *ngIf="canManageMembers()">
-                <button (click)="openAddMemberModal()"
-                  class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+              <div class="flex items-center space-x-4">
+                <button *ngIf="canManageMembers()"
+                  (click)="openUpdateDialog()"
+                  mat-icon-button>
+                  <mat-icon>settings</mat-icon>
+                </button>
+                <button *ngIf="canManageMembers()"
+                  (click)="openAddMemberModal()"
+                  mat-raised-button
+                  color="primary">
                   Add Member
                 </button>
               </div>
@@ -43,53 +63,37 @@ import { Router } from '@angular/router';
               <table class="min-w-full divide-y divide-gray-200">
                 <thead>
                   <tr>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                   <tr *ngFor="let member of members">
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="flex items-center">
-                        <img [src]="member.user.profilePicture || 'assets/default-avatar.png'" 
-                          class="h-8 w-8 rounded-full" alt="User avatar">
-                        <div class="ml-4">
-                          <div class="text-sm font-medium text-gray-900">{{member.user.name}}</div>
+                        <div class="text-sm font-medium text-gray-900">
+                          {{member.user.name}}
                         </div>
                       </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-900">{{member.user.email}}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                        [ngClass]="{
-                          'bg-green-100 text-green-800': member.role === 'owner',
-                          'bg-blue-100 text-blue-800': member.role === 'admin',
-                          'bg-gray-100 text-gray-800': member.role === 'member'
-                        }">
-                        {{member.role}}
-                      </span>
+                      <span class="text-sm text-gray-900">{{member.role}}</span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div class="flex space-x-4 justify-end">
-                        <button *ngIf="canManageRoles(member.role)"
-                                (click)="openUpdateRoleModal(member)"
-                                [disabled]="isRemovingMember[member.user._id]"
-                                class="text-indigo-600 hover:text-indigo-900 disabled:text-gray-400">
-                          Update Role
-                        </button>
-                        <button *ngIf="canManageRoles(member.role)"
-                                (click)="removeMember(member.user._id)"
-                                [disabled]="isRemovingMember[member.user._id]"
-                                class="text-red-600 hover:text-red-900 disabled:text-gray-400 flex items-center space-x-1">
-                          <span>{{ isRemovingMember[member.user._id] ? 'Removing...' : 'Remove' }}</span>
-                          <div *ngIf="isRemovingMember[member.user._id]" 
-                               class="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
-                        </button>
-                      </div>
+                      <button *ngIf="canManageRoles(member.role)"
+                        (click)="openUpdateRoleModal(member)"
+                        mat-button
+                        color="primary">
+                        Change Role
+                      </button>
+                      <button *ngIf="canManageRoles(member.role)"
+                        (click)="removeMember(member.user._id)"
+                        mat-button
+                        color="warn"
+                        [disabled]="isRemovingMember[member.user._id]">
+                        Remove
+                      </button>
                     </td>
                   </tr>
                 </tbody>
@@ -97,88 +101,87 @@ import { Router } from '@angular/router';
             </div>
           </div>
         </div>
+      </div>
+    </div>
 
-        <!-- Add Member Modal -->
-        <div *ngIf="showAddMemberModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-          <div class="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 class="text-xl font-semibold mb-4">Add New Member</h2>
-            <form [formGroup]="addMemberForm" (ngSubmit)="addMember()">
-              <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Select User</label>
-                <div *ngIf="isLoadingUsers" class="flex justify-center py-4">
-                  <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
-                </div>
-                <select *ngIf="!isLoadingUsers" 
-                        formControlName="userId" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                  <option value="">Select a user</option>
-                  <option *ngFor="let user of availableUsers" [value]="user._id">
-                    {{user.name}} ({{user.email}})
-                  </option>
-                </select>
-                <div *ngIf="!isLoadingUsers && availableUsers.length === 0" class="text-gray-500 text-sm mt-2">
-                  No users available to add
-                </div>
-              </div>
-              
-              <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
-                <select formControlName="role"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                  <option value="member">Member</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
+    <!-- Add Member Modal -->
+    <div *ngIf="showAddMemberModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+      <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+          <h3 class="text-lg font-medium text-gray-900">Add New Member</h3>
+          <form [formGroup]="addMemberForm" (ngSubmit)="addMember()" class="mt-4">
+            <mat-form-field class="w-full">
+              <mat-label>Select User</mat-label>
+              <mat-select formControlName="userId">
+                <mat-option *ngFor="let user of availableUsers" [value]="user._id">
+                  {{user.name}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
 
-              <div class="flex justify-end space-x-3">
-                <button type="button" 
-                        (click)="showAddMemberModal = false"
-                        class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                  Cancel
-                </button>
-                <button type="submit"
-                        [disabled]="!addMemberForm.valid || isLoading"
-                        class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400">
-                  {{isLoading ? 'Adding...' : 'Add Member'}}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+            <mat-form-field class="w-full mt-4">
+              <mat-label>Role</mat-label>
+              <mat-select formControlName="role">
+                <mat-option value="member">Member</mat-option>
+                <mat-option value="admin">Admin</mat-option>
+              </mat-select>
+            </mat-form-field>
 
-        <!-- Update Role Modal -->
-        <div *ngIf="showUpdateRoleModal && selectedMember" 
-             class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-          <div class="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 class="text-xl font-semibold mb-4">Update Role for {{selectedMember.user.name}}</h2>
-            <form [formGroup]="updateRoleForm" (ngSubmit)="updateRole()">
-              <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
-                <select formControlName="role"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                  <option value="member">Member</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-
-              <div class="flex justify-end space-x-3">
-                <button type="button" 
-                        (click)="showUpdateRoleModal = false"
-                        class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                  Cancel
-                </button>
-                <button type="submit"
-                        [disabled]="!updateRoleForm.valid || isLoading"
-                        class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400">
-                  {{isLoading ? 'Updating...' : 'Update Role'}}
-                </button>
-              </div>
-            </form>
-          </div>
+            <div class="flex justify-end space-x-4 mt-4">
+              <button type="button" 
+                mat-button
+                (click)="showAddMemberModal = false">
+                Cancel
+              </button>
+              <button type="submit"
+                mat-raised-button
+                color="primary"
+                [disabled]="!addMemberForm.valid || isLoading">
+                Add Member
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
-  `
+
+    <!-- Update Role Modal -->
+    <div *ngIf="showUpdateRoleModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+      <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+          <h3 class="text-lg font-medium text-gray-900">Update Member Role</h3>
+          <form [formGroup]="updateRoleForm" (ngSubmit)="updateRole()" class="mt-4">
+            <mat-form-field class="w-full">
+              <mat-label>Role</mat-label>
+              <mat-select formControlName="role">
+                <mat-option value="member">Member</mat-option>
+                <mat-option value="admin">Admin</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <div class="flex justify-end space-x-4 mt-4">
+              <button type="button"
+                mat-button
+                (click)="showUpdateRoleModal = false">
+                Cancel
+              </button>
+              <button type="submit"
+                mat-raised-button
+                color="primary"
+                [disabled]="!updateRoleForm.valid || isLoading">
+                Update Role
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [`
+    :host {
+      display: block;
+    }
+  `]
 })
 export class OrganizationDetailsComponent implements OnInit {
   organization: Organization | null = null;
@@ -199,8 +202,9 @@ export class OrganizationDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private organizationService: OrganizationService,
     private authService: AuthService,
-    private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private dialog: DialogService,
+    private fb: FormBuilder
   ) {
     this.addMemberForm = this.fb.group({
       userId: ['', Validators.required],
@@ -249,11 +253,16 @@ export class OrganizationDetailsComponent implements OnInit {
 
   loadAvailableUsers(orgId: string) {
     this.isLoadingUsers = true;
-    this.authService.getRemainingUsers(orgId).subscribe({
+    this.availableUsers = []; // Reset the list before loading
+
+    this.organizationService.getRemainingUsers(orgId).subscribe({
       next: (response) => {
-        console.log('Available users loaded:', response);
-        if (response.success) {
+        console.log('Available users response:', response);
+        if (response.success && response.data?.users) {
           this.availableUsers = response.data.users;
+          console.log('Available users loaded:', this.availableUsers);
+        } else {
+          console.warn('No users data in response:', response);
         }
       },
       error: (error) => {
@@ -283,9 +292,18 @@ export class OrganizationDetailsComponent implements OnInit {
   }
 
   openAddMemberModal() {
-    if (!this.canManageMembers()) {
+    if (!this.canManageMembers() || !this.organization) {
       return;
     }
+    
+    // Reset the form
+    this.addMemberForm.reset({
+      userId: '',
+      role: 'member'
+    });
+
+    // Load available users before showing the modal
+    this.loadAvailableUsers(this.organization._id);
     this.showAddMemberModal = true;
   }
 
@@ -385,5 +403,36 @@ export class OrganizationDetailsComponent implements OnInit {
         }
       });
     }
+  }
+
+  openUpdateDialog() {
+    if (!this.organization) return;
+
+    const dialogRef = this.dialog.open(UpdateOrganizationDialogComponent, {
+      data: { organization: this.organization },
+      width: '500px'
+    });
+
+    dialogRef.afterClosed().subscribe((result: { name: string; description?: string; logo?: string } | undefined) => {
+      if (result) {
+        this.updateOrganization(result);
+      }
+    });
+  }
+
+  private updateOrganization(data: { name: string; description?: string; logo?: string }) {
+    if (!this.organization?._id) return;
+
+    this.organizationService.updateOrganization(this.organization._id, data)
+      .subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.organization = response.data.organization;
+          }
+        },
+        error: (error) => {
+          console.error('Error updating organization:', error);
+        }
+      });
   }
 }

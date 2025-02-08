@@ -64,4 +64,8 @@ export class OrganizationService {
   getOrganizationById(orgId: string): Observable<{ success: boolean; message: string; data: Organization }> {
     return this.http.get<any>(`${environment.apiUrl}/organizations/${orgId}`);
   }
+
+  getRemainingUsers(orgId: string): Observable<{ success: boolean; message: string; data: { users: any[] } }> {
+    return this.http.get<any>(`${environment.apiUrl}/organizations/${orgId}/remaining-users`);
+  }
 }

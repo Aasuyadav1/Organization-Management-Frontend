@@ -150,6 +150,33 @@ export class AuthService {
       users: User[] 
     } 
   }> {
-    return this.http.get<any>(`${environment.apiUrl}/auth/organizations/${orgId}/remaining-users`);
+    return this.http.get<any>(`${environment.apiUrl}/organizations/${orgId}/remaining-users`);
+  }
+
+  updateProfile(data: { name?: string; email?: string; description?: string }): Observable<{
+    success: boolean;
+    message: string;
+    data: User;
+  }> {
+    return this.http.put<{ success: boolean; message: string; data: User }>(
+      `${environment.apiUrl}/users/profile`,
+      data
+    ).pipe(
+      tap(response => {
+        if (response.success) {
+          // Update the current user in the BehaviorSubject
+          const currentUser = this.currentUserSubject.value;
+          if (currentUser) {
+            const updatedUser = {
+              ...currentUser,
+              ...response.data
+            };
+            // Update both BehaviorSubject and localStorage
+            this.currentUserSubject.next(updatedUser);
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+          }
+        }
+      })
+    );
   }
 }
