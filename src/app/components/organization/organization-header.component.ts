@@ -8,7 +8,7 @@ import { Organization } from '../../interfaces/organization.interface';
   imports: [CommonModule],
   template: `
     <div class="px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-200">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div class="flex items-center">
           <div class="h-12 w-12 sm:h-16 sm:w-16 flex items-center justify-center bg-indigo-100 rounded-full">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 sm:h-10 sm:w-10 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -20,7 +20,7 @@ import { Organization } from '../../interfaces/organization.interface';
             <p class="text-sm sm:text-base text-gray-500">{{organization?.description}}</p>
           </div>
         </div>
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4">
           <button *ngIf="isOwner"
             (click)="onUpdateClick()"
             class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">

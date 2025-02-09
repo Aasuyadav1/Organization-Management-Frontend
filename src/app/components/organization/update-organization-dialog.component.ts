@@ -23,7 +23,7 @@ import { Organization } from '../../interfaces/organization.interface';
         </button>
       </div>
       
-      <form [formGroup]="updateForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      <form [formGroup]="updateForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
         <div class="form-group">
           <label for="name" class="block mb-2">Organization Name</label>
           <input 

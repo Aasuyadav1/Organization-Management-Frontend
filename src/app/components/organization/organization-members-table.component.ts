@@ -49,7 +49,7 @@ import { OrganizationMember } from '../../interfaces/organization.interface';
                 </span>
               </td>
               <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <div class="flex justify-end space-x-2">
+                <div class="flex justify-end gap-2">
                   <button *ngIf="canManageRoles(member.role)"
                           (click)="onUpdateRole(member)"
                           class="text-sm py-2 px-4 rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 transition-colors">

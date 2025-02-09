@@ -10,12 +10,12 @@ import { AuthService } from '../../../services/auth.service';
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
     <div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md">
+      <div class="max-w-md w-full flex flex-col gap-8 bg-white p-8 rounded-lg shadow-md">
         <div class="text-center">
           <h2 class="text-3xl font-bold text-gray-900">Sign in</h2>
         </div>
 
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
           <div>
             <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
             <input

@@ -15,7 +15,7 @@ import { Router } from '@angular/router';
         <div class="bg-white shadow rounded-lg p-6">
           <h1 class="text-2xl font-bold text-gray-900 mb-6">Profile Settings</h1>
 
-          <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="space-y-6">
+          <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="flex flex-col gap-6">
             <!-- Name Field -->
             <div>
               <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
@@ -53,7 +53,7 @@ import { Router } from '@angular/router';
             </div>
 
             <!-- Form Buttons -->
-            <div class="flex justify-end space-x-4">
+            <div class="flex justify-end gap-4">
               <button
                 type="button"
                 (click)="cancel()"

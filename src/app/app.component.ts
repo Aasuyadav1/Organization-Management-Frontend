@@ -15,7 +15,7 @@ import { AuthService } from './services/auth.service';
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between h-16">
             <div class="flex">
-              <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+              <div class="hidden sm:ml-6 sm:flex gap-8">
                 <a routerLink="/dashboard" 
                    routerLinkActive="border-indigo-500 text-indigo-600"
                    [routerLinkActiveOptions]="{exact: true}"
@@ -24,7 +24,7 @@ import { AuthService } from './services/auth.service';
                 </a>
               </div>
             </div>
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center gap-4">
               <!-- User Profile -->
               <div class="flex items-center">
                 <div class="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
