@@ -27,7 +27,7 @@ export class OrganizationService {
   }
 
   deleteOrganization(orgId: string): Observable<{ success: boolean; message: string }> {
-    return this.http.delete<any>(`${environment.apiUrl}/organizations/${orgId}`);
+    return this.http.delete<{ success: boolean; message: string }>(`${environment.apiUrl}/organizations/${orgId}`);
   }
 
   updateUserRole(orgId: string, userId: string, role: string): Observable<{

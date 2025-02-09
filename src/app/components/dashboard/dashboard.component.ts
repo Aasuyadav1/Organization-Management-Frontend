@@ -10,17 +10,18 @@ import { OrganizationService } from '../../services/organization.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   template: `
-    <!-- Main Dashboard Container -->
-    <div class="min-h-screen bg-gray-50 p-6">
-      <div class="max-w-7xl mx-auto">
+    <div class="min-h-screen bg-gray-50 py-4 sm:py-6">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header with Create Button -->
         <div class="flex justify-between items-center mb-6">
-          <h1 class="text-2xl font-semibold text-gray-900">My Organizations</h1>
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">My Organizations</h1>
           <div class="flex items-center space-x-4">
             <button 
               (click)="showCreateModal = true"
-              class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-            >
+              class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
               Create Organization
             </button>
             <button 
@@ -36,91 +37,88 @@ import { OrganizationService } from '../../services/organization.service';
         </div>
 
         <!-- Organizations Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <!-- Organization Card -->
           <div 
             *ngFor="let org of organizations" 
             (click)="navigateToOrganization(org._id)"
-            class="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow"
+            class="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow duration-300"
           >
             <!-- Organization Header -->
-            <div class="flex items-center space-x-4">
-              <img 
-                [src]="org.logo || 'assets/default-org-logo.png'" 
-                alt="Organization logo"
-                class="w-12 h-12 rounded-full object-cover"
-                (error)="org.logo = 'assets/default-org-logo.png'"
-              >
-              <div>
-                <h3 class="text-lg font-medium text-gray-900">{{org.name}}</h3>
-                <p class="text-sm text-gray-500">{{org.description}}</p>
+            <div class="p-4 sm:p-6">
+              <div class="flex items-center space-x-4">
+                <img 
+                  [src]="org.logo || 'assets/default-org-logo.png'" 
+                  class="h-12 w-12 sm:h-16 sm:w-16 rounded-full" alt="Organization logo">
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-lg sm:text-xl font-semibold text-gray-900 truncate">{{org.name}}</h3>
+                  <p class="text-sm text-gray-500 truncate">{{org.description}}</p>
+                </div>
               </div>
-            </div>
-            <!-- Member Count -->
-            <div class="mt-4 text-sm text-gray-500">
-              {{(org.members || []).length}} members
+              <!-- Member Count -->
+              <div class="mt-4 text-sm text-gray-500">
+                {{(org.members || []).length}} members
+              </div>
             </div>
           </div>
         </div>
 
         <!-- Create Organization Modal -->
-        <div *ngIf="showCreateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div class="bg-white rounded-lg p-6 max-w-md w-full">
-            <h2 class="text-xl font-semibold mb-4">Create New Organization</h2>
-            
-            <!-- Create Organization Form -->
-            <form [formGroup]="createForm" (ngSubmit)="createOrganization()" class="space-y-4">
-              <!-- Name Field -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Name</label>
-                <input 
-                  type="text" 
-                  formControlName="name"
-                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-                  placeholder="Organization name"
-                >
-              </div>
+        <div *ngIf="showCreateModal" class="fixed inset-0 z-50">
+          <div class="absolute inset-0 bg-black opacity-40"></div>
+          <div class="relative z-50 h-full flex items-center justify-center p-4">
+            <div class="bg-white rounded-lg w-full max-w-md p-6 shadow-xl">
+              <div class="mt-2">
+                <h3 class="text-lg text-gray-900 mb-4">Create New Organization</h3>
+                <form [formGroup]="createForm" (ngSubmit)="createOrganization()" class="mt-4">
+                  <!-- Name Field -->
+                  <div class="mb-4">
+                    <label class="block text-sm text-gray-700 mb-2">Name</label>
+                    <input 
+                      type="text" 
+                      formControlName="name"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="Organization name">
+                  </div>
 
-              <!-- Description Field -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Description</label>
-                <textarea 
-                  formControlName="description"
-                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-                  placeholder="Organization description"
-                  rows="3"
-                ></textarea>
-              </div>
+                  <!-- Description Field -->
+                  <div class="mb-4">
+                    <label class="block text-sm text-gray-700 mb-2">Description</label>
+                    <textarea 
+                      formControlName="description"
+                      rows="3"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="Organization description"></textarea>
+                  </div>
 
-              <!-- Logo URL Field -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Logo URL (optional)</label>
-                <input 
-                  type="text" 
-                  formControlName="logo"
-                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-                  placeholder="https://example.com/logo.png"
-                >
-              </div>
+                  <!-- Logo URL Field -->
+                  <div class="mb-4">
+                    <label class="block text-sm text-gray-700 mb-2">Logo URL (optional)</label>
+                    <input 
+                      type="text" 
+                      formControlName="logo"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="https://example.com/logo.png">
+                  </div>
 
-              <!-- Form Actions -->
-              <div class="flex justify-end space-x-3">
-                <button 
-                  type="button" 
-                  (click)="showCreateModal = false"
-                  class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  [disabled]="!createForm.valid"
-                  class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
-                >
-                  Create
-                </button>
+                  <!-- Form Actions -->
+                  <div class="flex justify-end space-x-3 mt-6">
+                    <button 
+                      type="button" 
+                      (click)="showCreateModal = false"
+                      class="px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
+                      Cancel
+                    </button>
+                    <button 
+                      type="submit" 
+                      [disabled]="!createForm.valid"
+                      class="inline-flex items-center px-4 py-2 text-sm text-white bg-indigo-600 hover:bg-indigo-700 rounded-md transition-colors disabled:opacity-50">
+                      Create Organization
+                    </button>
+                  </div>
+                </form>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>
