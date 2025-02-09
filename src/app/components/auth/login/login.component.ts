@@ -15,6 +15,11 @@ import { AuthService } from '../../../services/auth.service';
           <h2 class="text-3xl font-bold text-gray-900">Sign in</h2>
         </div>
 
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
+          {{ errorMessage }}
+        </div>
+
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
           <div>
             <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
@@ -71,6 +76,7 @@ import { AuthService } from '../../../services/auth.service';
 export class LoginComponent {
   loginForm: FormGroup;
   isLoading = false;
+  errorMessage: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -86,6 +92,7 @@ export class LoginComponent {
   onSubmit() {
     if (this.loginForm.valid) {
       this.isLoading = true;
+      this.errorMessage = ''; // Clear any previous errors
       this.authService.login(this.loginForm.value).subscribe({
         next: () => {
           this.router.navigate(['/dashboard']);
@@ -93,6 +100,12 @@ export class LoginComponent {
         error: (error) => {
           console.error('Login failed:', error);
           this.isLoading = false;
+          // Handle the error message from the API
+          if (error.error && error.error.message) {
+            this.errorMessage = error.error.message;
+          } else {
+            this.errorMessage = 'Login failed. Please check your credentials and try again.';
+          }
         }
       });
     }
