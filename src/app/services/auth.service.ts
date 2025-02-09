@@ -143,14 +143,12 @@ export class AuthService {
     return this.http.get<UsersResponse>(`${environment.apiUrl}/auth/users`);
   }
 
-  getRemainingUsers(orgId: string): Observable<{ 
-    success: boolean; 
-    message: string; 
-    data: { 
-      users: User[] 
-    } 
+  getRemainingUsers(orgId: string): Observable<{
+    success: boolean;
+    message: string;
+    data: User[]
   }> {
-    return this.http.get<any>(`${environment.apiUrl}/organizations/${orgId}/remaining-users`);
+    return this.http.get<any>(`${environment.apiUrl}/auth/organizations/${orgId}/remaining-users`);
   }
 
   updateProfile(data: { name?: string; email?: string; description?: string }): Observable<{

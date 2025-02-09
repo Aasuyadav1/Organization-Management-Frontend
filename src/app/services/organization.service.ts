@@ -22,7 +22,7 @@ export class OrganizationService {
     return this.http.get<any>(`${environment.apiUrl}/organizations/${orgId}/members`);
   }
 
-  updateOrganization(orgId: string, data: UpdateOrganization): Observable<{ success: boolean; message: string; data: { organization: Organization } }> {
+  updateOrganization(orgId: string, data: UpdateOrganization): Observable<any> {
     return this.http.put<any>(`${environment.apiUrl}/organizations/${orgId}`, data);
   }
 
@@ -66,6 +66,6 @@ export class OrganizationService {
   }
 
   getRemainingUsers(orgId: string): Observable<{ success: boolean; message: string; data: { users: any[] } }> {
-    return this.http.get<any>(`${environment.apiUrl}/organizations/${orgId}/remaining-users`);
+    return this.http.get<any>(`${environment.apiUrl}/auth/organizations/${orgId}/remaining-users`);
   }
 }

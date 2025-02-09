@@ -58,7 +58,7 @@ import { OrganizationService } from '../../services/organization.service';
             </div>
             <!-- Member Count -->
             <div class="mt-4 text-sm text-gray-500">
-              {{org.members?.length || 0}} members
+              {{(org.members || []).length}} members
             </div>
           </div>
         </div>

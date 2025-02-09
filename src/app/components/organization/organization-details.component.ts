@@ -7,24 +7,11 @@ import { User } from '../../interfaces/user.interface';
 import { OrganizationService } from '../../services/organization.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
-import { DialogService } from '../../services/dialog.service';
-import { UpdateOrganizationDialogComponent } from './update-organization-dialog.component';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-organization-details',
   standalone: true,
-  imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    MatButtonModule, 
-    MatIconModule, 
-    MatFormFieldModule, 
-    MatSelectModule
-  ],
+  imports: [CommonModule, ReactiveFormsModule],
   template: `
     <div class="min-h-screen bg-gray-50 py-6">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -43,13 +30,16 @@ import { MatSelectModule } from '@angular/material/select';
               <div class="flex items-center space-x-4">
                 <button *ngIf="canManageMembers()"
                   (click)="openUpdateDialog()"
-                  mat-icon-button>
-                  <mat-icon>settings</mat-icon>
+                  class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Update Organization
                 </button>
                 <button *ngIf="canManageMembers()"
                   (click)="openAddMemberModal()"
-                  mat-raised-button
-                  color="primary">
+                  class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                   Add Member
                 </button>
               </div>
@@ -83,14 +73,12 @@ import { MatSelectModule } from '@angular/material/select';
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button *ngIf="canManageRoles(member.role)"
                         (click)="openUpdateRoleModal(member)"
-                        mat-button
-                        color="primary">
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                         Change Role
                       </button>
                       <button *ngIf="canManageRoles(member.role)"
                         (click)="removeMember(member.user._id)"
-                        mat-button
-                        color="warn"
+                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                         [disabled]="isRemovingMember[member.user._id]">
                         Remove
                       </button>
@@ -110,32 +98,41 @@ import { MatSelectModule } from '@angular/material/select';
         <div class="mt-3">
           <h3 class="text-lg font-medium text-gray-900">Add New Member</h3>
           <form [formGroup]="addMemberForm" (ngSubmit)="addMember()" class="mt-4">
-            <mat-form-field class="w-full">
-              <mat-label>Select User</mat-label>
-              <mat-select formControlName="userId">
-                <mat-option *ngFor="let user of availableUsers" [value]="user._id">
-                  {{user.name}}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Select User</label>
+                <div *ngIf="isLoadingUsers" class="flex justify-center py-4">
+                  <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+                </div>
+                <select *ngIf="!isLoadingUsers" 
+                        formControlName="userId" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                  <option value="">Select a user</option>
+                  <option *ngFor="let user of availableUsers" [value]="user._id">
+                    {{user.name}} ({{user.email}})
+                  </option>
+                </select>
+                <div *ngIf="!isLoadingUsers && availableUsers.length === 0" class="text-gray-500 text-sm mt-2">
+                  No users available to add
+                </div>
+              </div>
 
-            <mat-form-field class="w-full mt-4">
-              <mat-label>Role</mat-label>
-              <mat-select formControlName="role">
-                <mat-option value="member">Member</mat-option>
-                <mat-option value="admin">Admin</mat-option>
-              </mat-select>
-            </mat-form-field>
+
+            <div class="w-full mt-4">
+              <label class="block text-sm font-medium text-gray-700">Role</label>
+              <select formControlName="role" class="mt-1 block w-full pl-10 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                <option value="member">Member</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
 
             <div class="flex justify-end space-x-4 mt-4">
               <button type="button" 
-                mat-button
+                class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
                 (click)="showAddMemberModal = false">
                 Cancel
               </button>
               <button type="submit"
-                mat-raised-button
-                color="primary"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                 [disabled]="!addMemberForm.valid || isLoading">
                 Add Member
               </button>
@@ -151,25 +148,75 @@ import { MatSelectModule } from '@angular/material/select';
         <div class="mt-3">
           <h3 class="text-lg font-medium text-gray-900">Update Member Role</h3>
           <form [formGroup]="updateRoleForm" (ngSubmit)="updateRole()" class="mt-4">
-            <mat-form-field class="w-full">
-              <mat-label>Role</mat-label>
-              <mat-select formControlName="role">
-                <mat-option value="member">Member</mat-option>
-                <mat-option value="admin">Admin</mat-option>
-              </mat-select>
-            </mat-form-field>
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700">Role</label>
+              <select formControlName="role" class="mt-1 block w-full pl-10 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                <option value="member">Member</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
 
             <div class="flex justify-end space-x-4 mt-4">
               <button type="button"
-                mat-button
+                class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
                 (click)="showUpdateRoleModal = false">
                 Cancel
               </button>
               <button type="submit"
-                mat-raised-button
-                color="primary"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                 [disabled]="!updateRoleForm.valid || isLoading">
                 Update Role
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update Organization Modal -->
+    <div *ngIf="showUpdateOrganizationModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+      <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">Update Organization</h3>
+          <form [formGroup]="updateOrganizationForm" (ngSubmit)="updateOrganization()" class="mt-4">
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Name</label>
+              <input type="text"
+                     formControlName="name"
+                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                     placeholder="Organization name">
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Description</label>
+              <textarea formControlName="description"
+                        rows="3"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        placeholder="Organization description"></textarea>
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Logo URL</label>
+              <input type="text"
+                     formControlName="logo"
+                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                     placeholder="https://example.com/logo.png">
+            </div>
+
+            <div class="flex items-center justify-end mt-4 space-x-3">
+              <button type="button"
+                      (click)="showUpdateOrganizationModal = false"
+                      class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Cancel
+              </button>
+              <button type="submit"
+                      [disabled]="!updateOrganizationForm.valid || isLoading"
+                      class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50">
+                <svg *ngIf="isLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {{ isLoading ? 'Updating...' : 'Update Organization' }}
               </button>
             </div>
           </form>
@@ -197,13 +244,14 @@ export class OrganizationDetailsComponent implements OnInit {
   availableUsers: User[] = [];
   addMemberForm: FormGroup;
   private currentUserId: string | null = null;
+  showUpdateOrganizationModal = false;
+  updateOrganizationForm: FormGroup;
 
   constructor(
     private route: ActivatedRoute,
     private organizationService: OrganizationService,
     private authService: AuthService,
     private router: Router,
-    private dialog: DialogService,
     private fb: FormBuilder
   ) {
     this.addMemberForm = this.fb.group({
@@ -213,6 +261,12 @@ export class OrganizationDetailsComponent implements OnInit {
 
     this.updateRoleForm = this.fb.group({
       role: ['', Validators.required]
+    });
+
+    this.updateOrganizationForm = this.fb.group({
+      name: ['', Validators.required],
+      description: [''],
+      logo: ['']
     });
 
     // Subscribe to currentUser$ to get the current user's ID
@@ -255,21 +309,17 @@ export class OrganizationDetailsComponent implements OnInit {
     this.isLoadingUsers = true;
     this.availableUsers = []; // Reset the list before loading
 
-    this.organizationService.getRemainingUsers(orgId).subscribe({
+    this.authService.getRemainingUsers(orgId).subscribe({
       next: (response) => {
-        console.log('Available users response:', response);
-        if (response.success && response.data?.users) {
-          this.availableUsers = response.data.users;
-          console.log('Available users loaded:', this.availableUsers);
-        } else {
-          console.warn('No users data in response:', response);
+        console.log('Available users loaded:', response);
+        if (response.success) {
+          this.availableUsers = response.data;
+          console.log('Available users set:', this.availableUsers);
         }
+        this.isLoadingUsers = false;
       },
       error: (error) => {
         console.error('Error loading available users:', error);
-        this.availableUsers = [];
-      },
-      complete: () => {
         this.isLoadingUsers = false;
       }
     });
@@ -408,30 +458,36 @@ export class OrganizationDetailsComponent implements OnInit {
   openUpdateDialog() {
     if (!this.organization) return;
 
-    const dialogRef = this.dialog.open(UpdateOrganizationDialogComponent, {
-      data: { organization: this.organization },
-      width: '500px'
+    this.updateOrganizationForm.patchValue({
+      name: this.organization.name,
+      description: this.organization.description,
+      logo: this.organization.logo
     });
 
-    dialogRef.afterClosed().subscribe((result: { name: string; description?: string; logo?: string } | undefined) => {
-      if (result) {
-        this.updateOrganization(result);
-      }
-    });
+    this.showUpdateOrganizationModal = true;
   }
 
-  private updateOrganization(data: { name: string; description?: string; logo?: string }) {
-    if (!this.organization?._id) return;
+  updateOrganization() {
+    if (!this.organization || !this.updateOrganizationForm.valid || this.isLoading) return;
 
-    this.organizationService.updateOrganization(this.organization._id, data)
+    this.isLoading = true;
+    const { name, description, logo } = this.updateOrganizationForm.value;
+
+    this.organizationService.updateOrganization(this.organization._id, { name, description, logo })
       .subscribe({
         next: (response) => {
-          if (response.success) {
-            this.organization = response.data.organization;
+          console.log("updated modal org",response);
+          
+          if (response) {
+            this.organization = response;
+            this.showUpdateOrganizationModal = false;
           }
         },
         error: (error) => {
           console.error('Error updating organization:', error);
+        },
+        complete: () => {
+          this.isLoading = false;
         }
       });
   }
