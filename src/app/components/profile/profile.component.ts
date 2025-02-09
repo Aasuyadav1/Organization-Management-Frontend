@@ -119,10 +119,12 @@ export class ProfileComponent implements OnInit {
           if (response.success) {
             // The auth service should handle updating the currentUser$ stream
             console.log('Profile updated successfully');
+            this.router.navigate(['/dashboard']);
           }
         },
         error: (error) => {
           console.error('Error updating profile:', error);
+          this.isLoading = false;
         },
         complete: () => {
           this.isLoading = false;

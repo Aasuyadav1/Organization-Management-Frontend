@@ -157,7 +157,7 @@ export class AuthService {
     data: User;
   }> {
     return this.http.put<{ success: boolean; message: string; data: User }>(
-      `${environment.apiUrl}/users/profile`,
+      `${environment.apiUrl}/auth/profile`,
       data
     ).pipe(
       tap(response => {
