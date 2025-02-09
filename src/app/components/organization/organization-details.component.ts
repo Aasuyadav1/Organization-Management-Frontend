@@ -74,7 +74,7 @@ import { Router } from '@angular/router';
                     <td class="px-4 py-4 whitespace-nowrap">
                       <div class="flex items-center">
                         <div class="flex-shrink-0 h-8 w-8">
-                          <img class="h-8 w-8 rounded-full" [src]="member.user.avatar || 'assets/default-avatar.png'" alt="">
+                          <img class="h-8 w-8 rounded-full" [src]="member.user.profilePicture || 'assets/default-avatar.png'" alt="Member avatar">
                         </div>
                         <div class="ml-4">
                           <div class="text-sm font-medium text-gray-900">{{member.user.name}}</div>
@@ -212,7 +212,7 @@ import { Router } from '@angular/router';
             <div class="mt-2">
               <h3 class="text-lg text-gray-900 mb-2">Remove Member</h3>
               <p class="text-sm text-gray-600 mb-4">
-                Are you sure you want to remove {{memberToRemove?.user.name}} from this organization?
+                Are you sure you want to remove {{memberToRemove?.user?.name ?? 'this member'}} from this organization?
               </p>
               <div class="flex justify-end space-x-3">
                 <button type="button"
@@ -222,7 +222,7 @@ import { Router } from '@angular/router';
                 </button>
                 <button type="button"
                         (click)="confirmRemoveMember()"
-                        [disabled]="isRemovingMember[memberToRemove?.user._id || '']"
+                        [disabled]="isRemovingMember[memberToRemove?.user?._id ?? '']"
                         class="px-4 py-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors disabled:opacity-50">
                   Remove
                 </button>
