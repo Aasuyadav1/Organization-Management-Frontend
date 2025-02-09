@@ -17,26 +17,36 @@ import { OrganizationMembersTableComponent } from './organization-members-table.
   template: `
     <div class="min-h-screen bg-gray-50 py-4 sm:py-6">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white shadow rounded-lg">
-          <!-- Organization Header -->
-          <app-organization-header
-            [organization]="organization"
-            [isOwner]="isOwner()"
-            [canManageMembers]="canManageMembers()"
-            (updateOrganization)="openUpdateDialog()"
-            (deleteOrganization)="openDeleteConfirmModal()"
-            (addMember)="openAddMemberModal()">
-          </app-organization-header>
+        <!-- Loading State -->
+        <ng-container *ngIf="isLoading">
+          <div class="flex justify-center items-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+          </div>
+        </ng-container>
 
-          <!-- Members Table -->
-          <app-organization-members-table
-            [members]="members"
-            [isRemovingMember]="isRemovingMember"
-            [canManageRoles]="canManageRoles.bind(this)"
-            (updateRole)="openUpdateRoleModal($event)"
-            (removeMember)="openRemoveConfirmModal($event)">
-          </app-organization-members-table>
-        </div>
+        <!-- Content after loading -->
+        <ng-container *ngIf="!isLoading">
+          <div class="bg-white shadow rounded-lg">
+            <!-- Organization Header -->
+            <app-organization-header
+              [organization]="organization"
+              [isOwner]="isOwner()"
+              [canManageMembers]="canManageMembers()"
+              (updateOrganization)="openUpdateDialog()"
+              (deleteOrganization)="openDeleteConfirmModal()"
+              (addMember)="openAddMemberModal()">
+            </app-organization-header>
+
+            <!-- Members Table -->
+            <app-organization-members-table
+              [members]="members"
+              [isRemovingMember]="isRemovingMember"
+              [canManageRoles]="canManageRoles.bind(this)"
+              (updateRole)="openUpdateRoleModal($event)"
+              (removeMember)="openRemoveConfirmModal($event)">
+            </app-organization-members-table>
+          </div>
+        </ng-container>
       </div>
 
       <!-- Add Member Modal -->
@@ -291,6 +301,7 @@ export class OrganizationDetailsComponent implements OnInit {
   }
 
   loadOrganization(orgId: string) {
+    this.isLoading = true;
     this.organizationService.getOrganizationById(orgId).subscribe({
       next: (response) => {
         this.organization = response.data;
@@ -301,11 +312,12 @@ export class OrganizationDetailsComponent implements OnInit {
           const currentMember = this.members.find(m => m.user._id === this.currentUserId);
           this.currentUserRole = currentMember?.role || 'member';
         }
-
+        this.isLoading = false;
         this.loadAvailableUsers(orgId);
       },
       error: (error) => {
-        console.error('Error loading organization:', error);
+        console.error('Failed to load organization:', error);
+        this.isLoading = false;
       }
     });
   }
@@ -467,6 +479,7 @@ export class OrganizationDetailsComponent implements OnInit {
           console.error('Failed to remove member:', error);
         },
         complete: () => {
+          this.isRemovingMember = {};
         }
       });
     }
